@@ -11,13 +11,17 @@ actions.index = function(request,response){
   User.find({},function(err,users){
     response.render('users/index',{
       results: users,
-      total: users.length
+      total: users.length,
+      properties: app.props
     });
   });
 };
 
 actions.new = function(request,response){
-  response.render('users/new');
+  response.render('users/new',
+    {
+    properties: app.props
+    });
 };
 
 actions.create = function(request,response){
@@ -27,9 +31,16 @@ actions.create = function(request,response){
     user.pass = crypto.createHash('md5').update(user.pass).digest("hex");
     user.save(function(err){
       console.log('created a user.')
+      var buffer = [];
+      app.io.sockets.on('connection', function (socket) {
+        socket.send({ buffer: buffer });
+        socket.emit('user', { 'name': user.name });
+        buffer.push(user);
+      });
     });
     response.render('users/show',{
-      user: user.name
+      user: user.name,
+      properties: app.props
     })
   }else{
     response.redirect('users/new');

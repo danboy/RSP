@@ -6,7 +6,7 @@
   </head>
   <body>
     <header>
-      <h1>RoshamBo!</h1>
+      <h1>report</h1>
       <menu>
         <li><a href="/users/new">signup</a></li>
         <li><a href="/sessions/new">login</a></li>
@@ -17,5 +17,13 @@
         {{{body}}}
       </div>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io.connect();
+      socket.on('user', function (data) {
+        console.log(data);
+      });
+      console.log(socket);
+    </script>
   </body>
 </html>
