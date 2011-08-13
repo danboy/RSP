@@ -31,20 +31,44 @@ actions.create = function(request,response){
     user.pass = crypto.createHash('md5').update(user.pass).digest("hex");
     user.save(function(err){
       console.log('created a user.')
-      var buffer = [];
       app.io.sockets.on('connection', function (socket) {
-        socket.send({ buffer: buffer });
         socket.emit('user', { 'name': user.name });
-        buffer.push(user);
       });
     });
-    response.render('users/show',{
-      user: user.name,
-      properties: app.props
-    })
+    response.redirect('users/show/'+user.id);
   }else{
     response.redirect('users/new');
   }
+};
+
+actions.destroy = function(request,response){
+  User.findById( request.params.id , function(err,user){
+    if(!err){
+      user.remove();
+      user.save();
+      app.io.sockets.on('connection', function (socket) {
+        socket.emit('user', { 'name': user.name });
+      });
+    }
+    response.render('users/destroy',{
+      user: user.name,
+      message: 'user was deleted'
+    });
+  });
+};
+
+actions.show = function(request,response){
+  currentTime = new Date();
+  User.findById( request.params.id , function(err,user){
+    app.io.sockets.on('connection', function (socket) {
+      socket.emit('user', { 'name': user.name , 'message': 'user viewed their profile', 'time': currentTime });
+    });
+    response.render('users/show',{
+      user: user.name,
+      id: user.id,
+      properties: app.props
+    });
+  });
 };
 
 module.exports = actions;

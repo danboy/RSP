@@ -4,6 +4,6 @@
 <h1>{{total}} users.</h1>
 <ul>
   {{#results}}
-    <li>{{name}}</li>
+    <li><a class="delete" href="/users/show/{{id}}">{{name}}</a> - <a class="delete" href="/users/destroy/{{id}}">destroy</a></li>
   {{/results}}
 </ul>
